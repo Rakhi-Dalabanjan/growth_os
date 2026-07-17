@@ -1,0 +1,45 @@
+Analyze the following brand inputs and construct a comprehensive, professional, structured brand intelligence profile.
+
+Brand Inputs:
+- Brand Name: {brand_name}
+- Business Description: {business_description}
+- Mission: {mission}
+- Vision: {vision}
+- Target Audience: {target_audience}
+- Primary Market: {primary_market}
+- Brand Tone: {brand_tone}
+- Languages: {languages}
+- Preferred Words: {preferred_words}
+- Restricted Words: {restricted_words}
+- Competitors: {competitors}
+- CTA: {cta}
+- Brand Colors: {brand_colors}
+- Brand Fonts: {brand_fonts}
+
+Return the results as a valid JSON object. The response must follow this schema:
+{{
+    "summary": "An executive summary of the brand's position and identity.",
+    "brand_personality": ["List", "of", "brand", "personality", "traits", "or", "descriptors"],
+    "brand_voice": ["List", "of", "tone/voice", "guidelines"],
+    "ideal_customer": {{
+        "demographics": "Who is the ideal customer (demographics)?",
+        "behaviors": "Key behaviors and habits of the ideal customer.",
+        "pains": "Primary customer pain points."
+    }},
+    "customer_problems": ["List of problems the company solves for their customers"],
+    "customer_goals": ["List of goals/aspirations the customer has"],
+    "marketing_objectives": ["Key marketing goals or recommendations for this brand"],
+    "competitor_summary": "Analysis of the competitors and the brand's positioning.",
+    "recommended_content_pillars": ["List of 3-5 recommended content pillars/topics"],
+    "recommended_posting_frequency": "Suggested frequency (e.g., '3-4 times a week on LinkedIn and Instagram')",
+    "recommended_cta": ["List of effective calls-to-action for their audience"],
+    "recommended_hashtags": ["List of recommended hashtags"],
+    "strengths": ["List of brand strengths"],
+    "weaknesses": ["List of brand weaknesses"],
+    "opportunities": ["List of market opportunities"],
+    "risks": ["List of potential risks"],
+    "confidence_score": 95
+}}
+
+Make sure the confidence score is an integer between 0 and 100, representing the AI's confidence in this analysis based on the inputs provided.
+Return ONLY valid JSON. Do not include any markdown format blocks, surrounding quotes, or explanation text.

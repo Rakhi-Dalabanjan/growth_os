@@ -1,0 +1,49 @@
+Generate a comprehensive, professional social media marketing strategy based on the following Brand Intelligence profile.
+
+Brand Intelligence Profile:
+- Summary: {summary}
+- Brand Personality: {brand_personality}
+- Brand Voice/Tone: {brand_voice}
+- Ideal Customer Profile: {ideal_customer}
+- Customer Pain Points/Problems: {customer_problems}
+- Customer Aspirations/Goals: {customer_goals}
+- Core Marketing Objectives: {marketing_objectives}
+- Competitor Summary: {competitor_summary}
+- Recommended Content Pillars: {recommended_content_pillars}
+- Recommended Posting Frequency: {recommended_posting_frequency}
+- Recommended Calls-To-Action (CTAs): {recommended_cta}
+- Recommended Hashtags: {recommended_hashtags}
+- SWOT - Strengths: {strengths}
+- SWOT - Weaknesses: {weaknesses}
+- SWOT - Opportunities: {opportunities}
+- SWOT - Risks: {risks}
+
+Construct an actionable social media strategy and return the output as a valid JSON object matching the following structure:
+{{
+    "strategy_name": "Name of the Strategy (e.g. 'Brand Growth & Digital Launch Strategy')",
+    "business_goal": "A high-level business goal aligned with the brand's opportunities.",
+    "marketing_goal": "A concrete social media marketing objective based on the company's targets.",
+    "recommended_platforms": ["Platform 1", "Platform 2"],
+    "content_pillars": ["Pillar 1", "Pillar 2", "Pillar 3"],
+    "campaign_ideas": [
+        {{
+            "name": "Campaign Name",
+            "description": "Concept, theme, and actionable deployment details of the campaign.",
+            "duration": "e.g., Q3 (3 months)",
+            "channels": ["Platform 1"]
+        }}
+    ],
+    "posting_frequency": "Detailed suggestions (e.g., '3 times a week on LinkedIn, daily on Twitter').",
+    "recommended_formats": ["List of recommended formats such as Carousels, Short-form video, Newsletters, etc."],
+    "tone_guidelines": ["Guidelines on how to write post captions or interact with users"],
+    "audience_segments": ["Segment 1", "Segment 2"],
+    "cta_strategy": ["List of CTA copy formats and placement advice"],
+    "hashtags_strategy": ["Guidelines on tag count, custom tags, and niche tags"],
+    "kpis": ["Key performance metrics to monitor"],
+    "growth_recommendations": ["Ideas for organic amplification and distribution hacks"],
+    "risk_considerations": ["Threat vectors and compliance policies to note"],
+    "confidence_score": 90
+}}
+
+Ensure confidence_score is an integer between 0 and 100.
+Return ONLY valid JSON. Do not include preambles, explanations, or surrounding markdown blocks.

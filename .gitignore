@@ -1,0 +1,30 @@
+# Laravel files to ignore
+growthos/vendor/
+growthos/node_modules/
+growthos/bootstrap/cache/
+growthos/public/build/
+growthos/public/hot
+growthos/public/storage
+growthos/storage/*.key
+growthos/storage/pail
+growthos/storage/framework/cache/data/
+growthos/storage/framework/sessions/
+growthos/storage/framework/testing/
+growthos/storage/framework/views/
+
+# FastAPI files to ignore
+ai/.venv/
+ai/__pycache__/
+ai/tests/__pycache__/
+ai/tests/.pytest_cache/
+ai/.pytest_cache/
+ai/ai_test_response.json
+
+# Global environments and settings
+**/.env
+**/.env.backup
+**/.env.production
+**/*.log
+.DS_Store
+.vscode/
+.idea/
