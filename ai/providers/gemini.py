@@ -17,7 +17,37 @@ class GeminiProvider(BaseAIProvider):
         if self.is_mock:
             # Simulate network delay and return mock text
             await asyncio.sleep(0.1)
-            
+
+            import re
+            import json
+
+            # 1. Parse/Extract brand name from prompt
+            brand_name = "Acme Inc"
+            brand_match = re.search(r'(?:Brand Name:|Analyzing brand\s*\'|Brand Name:\s*)([^\'\n\r\t]+)', prompt, re.IGNORECASE)
+            if brand_match:
+                brand_name = brand_match.group(1).strip()
+                brand_name = brand_name.replace("'", "").replace('"', '').strip()
+            else:
+                strat_match = re.search(r'Strategy Name:\s*(.*)', prompt, re.IGNORECASE)
+                if strat_match:
+                    brand_name = strat_match.group(1).replace("Strategy", "").replace("Plan", "").strip()
+
+            if not brand_name or brand_name.lower() in ["n/a", "unknown"]:
+                brand_name = "Acme Inc"
+
+            # 2. Detect industry from prompt context
+            industry = "default"
+            prompt_lower = prompt.lower()
+            if any(k in prompt_lower for k in ["builder", "real estate", "villa", "property", "home", "construction"]):
+                industry = "real_estate"
+            elif any(k in prompt_lower for k in ["restaurant", "leaf", "food", "dining", "dish", "chef", "menu"]):
+                industry = "restaurant"
+            elif any(k in prompt_lower for k in ["dental", "clinic", "dentist", "smile", "tooth", "teeth"]):
+                industry = "dentistry"
+            elif any(k in prompt_lower for k in ["fitness", "gym", "workout", "trainer", "elite fitness"]):
+                industry = "fitness"
+
+            # 3. Handle Caption generation mock
             if "Social Media Copywriter" in prompt or "engaging caption" in prompt:
                 platform = "Instagram"
                 if "Target Platform: LinkedIn" in prompt:
@@ -35,7 +65,6 @@ class GeminiProvider(BaseAIProvider):
                 elif "Target Platform: Instagram" in prompt:
                     platform = "Instagram"
 
-                import re
                 tone = "Professional"
                 tone_match = re.search(r'- Tone:\s*(\w+)', prompt)
                 if tone_match:
@@ -46,27 +75,62 @@ class GeminiProvider(BaseAIProvider):
                 if lang_match:
                     language = lang_match.group(1)
 
+                if industry == "real_estate":
+                    headline = "Building for Generations"
+                    caption = f"From foundation to final paint, {brand_name} is dedicated to unparalleled craftsmanship. Discover how we turn blueprints into premium landmarks."
+                    cta = "Contact our building advisors today to discuss your project."
+                    keywords = ["construction", "real estate", "builders"]
+                    hashtags = ["#Construction", "#RealEstate", f"#{brand_name.replace(' ', '')}"]
+                    emojis = "🏢🏗🏡"
+                elif industry == "restaurant":
+                    headline = "Grown with Care, Served with Love"
+                    caption = f"At {brand_name}, we believe great meals start with healthy organic soil. Taste the vibrant culinary flavors of our freshly harvested farm-to-table specials."
+                    cta = "Reserve your table for tonight's dining experience."
+                    keywords = ["organic dining", "farm to table", "restaurant"]
+                    hashtags = ["#FarmToTable", "#OrganicFood", f"#{brand_name.replace(' ', '')}"]
+                    emojis = "🥗🌾🍷"
+                elif industry == "dentistry":
+                    headline = "Your Smile, Our Priority"
+                    caption = f"A healthy smile changes everything. At {brand_name}, we make standard check-ups comfortable, gentle, and completely anxiety-free."
+                    cta = "Book your check-up online today."
+                    keywords = ["dentistry", "dental clinic", "oral care"]
+                    hashtags = ["#DentalHealth", "#SmileCare", f"#{brand_name.replace(' ', '')}"]
+                    emojis = "🦷✨🏥"
+                elif industry == "fitness":
+                    headline = "Elevate Your Limits"
+                    caption = f"Success starts outside your comfort zone. At {brand_name}, we build form, strength, and community to keep you moving."
+                    cta = "Sign up for your free 3-day guest pass today."
+                    keywords = ["fitness", "gym strength", "workout"]
+                    hashtags = ["#FitnessGoals", "#GymLife", f"#{brand_name.replace(' ', '')}"]
+                    emojis = "💪🏋️🚴"
+                else:
+                    headline = "Unlocking Potential"
+                    caption = f"This is a simulated high-quality social media caption for {brand_name}. We design workflows that keep you ahead."
+                    cta = "Get started today."
+                    keywords = ["efficiency", "workflow", "productivity"]
+                    hashtags = ["#Efficiency", "#Success", f"#{brand_name.replace(' ', '')}"]
+                    emojis = "🚀✨📈"
+
                 mock_caption = {
                     "Platform": platform,
-                    "Headline": "Unlocking AI Productivity",
-                    "Caption": f"This is a simulated high-quality social media caption for {platform}. We design workflows that keep you ahead.",
-                    "Call To Action": "Get started with GrowthOS today.",
-                    "Primary Keywords": ["productivity", "AI", "workflow"],
-                    "Suggested Hashtags": ["#AI", "#Productivity", f"#{platform.replace(' ', '')}"],
-                    "Emoji Recommendation": "🚀✨📈",
+                    "Headline": headline,
+                    "Caption": caption,
+                    "Call To Action": cta,
+                    "Primary Keywords": keywords,
+                    "Suggested Hashtags": hashtags,
+                    "Emoji Recommendation": emojis,
                     "Tone": tone,
                     "Language": language,
-                    "Estimated Character Count": 150
+                    "Estimated Character Count": len(caption) + 50
                 }
-                import json
                 return {
                     "text": json.dumps(mock_caption),
                     "model": self.model,
                     "raw_response": {"mock": True, "prompt": prompt}
                 }
 
+            # 4. Handle Content Calendar generation mock
             elif "content calendar" in prompt or "calendar generation" in prompt or "monthly calendar" in prompt:
-                # Extract month and year from prompt
                 month_val = 7
                 year_val = 2026
                 month_names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
@@ -74,241 +138,273 @@ class GeminiProvider(BaseAIProvider):
                     if m_name in prompt:
                         month_val = i
                         break
-                import re
                 year_match = re.search(r'\b(202[4-9]|2030)\b', prompt)
                 if year_match:
                     year_val = int(year_match.group(1))
-                
-                brand_name = "GrowthOS"
-                for line in prompt.split("\n"):
-                    if "Brand Name:" in line:
-                        brand_name = line.split("Brand Name:")[-1].strip()
-                        break
-                    elif "Strategy Name:" in line:
-                        brand_name = line.split("Strategy Name:")[-1].replace("Strategy", "").replace("Strategy", "").strip()
-                        break
+
+                if industry == "real_estate":
+                    topic_1 = f"Choosing the right foundation for custom homes with {brand_name}"
+                    title_1 = "Foundations That Stand the Test of Time"
+                    pillar_1 = "Construction Excellence"
+                    cta_1 = "Schedule an engineering consultation"
+
+                    topic_2 = f"Inside the design phase of a modern property with {brand_name}"
+                    title_2 = "Modern Architecture: Concept to Blueprint"
+                    pillar_2 = "Design Innovations"
+                    cta_2 = "View our active portfolio"
+                elif industry == "restaurant":
+                    topic_1 = f"Behind our signature organic herb garden at {brand_name}"
+                    title_1 = "Harvest to Plate: Organic Culinary Difference"
+                    pillar_1 = "Farm-to-Table Freshness"
+                    cta_1 = "Book your table online"
+
+                    topic_2 = f"Chef's secrets for preparing the perfect seasonal dish"
+                    title_2 = "Crafting Fresh Autumn Flavors"
+                    pillar_2 = "Chef Specials"
+                    cta_2 = "Check out our full menu"
+                elif industry == "dentistry":
+                    topic_1 = f"Preventing tooth decay with pediatric tips from {brand_name}"
+                    title_1 = "Early Care: Building Strong Smiles"
+                    pillar_1 = "Preventative Care"
+                    cta_1 = "Schedule a consultation today"
+
+                    topic_2 = f"How modern safe whitening brightens your teeth at {brand_name}"
+                    title_2 = "Safe & Gentle Cosmetic Transformations"
+                    pillar_2 = "Cosmetic dentistry"
+                    cta_2 = "Book a scan appointment"
+                elif industry == "fitness":
+                    topic_1 = f"Correcting squat posture under supervision at {brand_name}"
+                    title_1 = "Perfect Squat Form: Safe Lift Hacks"
+                    pillar_1 = "Workout Techniques"
+                    cta_1 = "Get your guest pass"
+
+                    topic_2 = f"Why high intensity workouts build heart health"
+                    title_2 = "HIIT Routines: Burn and Recover"
+                    pillar_2 = "Functional training"
+                    cta_2 = "Try our class schedule"
+                else:
+                    topic_1 = f"How to automate workflows for {brand_name}"
+                    title_1 = "Save 10+ Hours/Week with Smart Automation"
+                    pillar_1 = "AI & Productivity Tips"
+                    cta_1 = "Start your free trial today"
+
+                    topic_2 = f"Stop manual operations. Let AI orchestrate your schedule."
+                    title_2 = "Under the Hood: Performance Optimization"
+                    pillar_2 = "Tech Architecture"
+                    cta_2 = "Join the waitlist"
 
                 mock_posts = [
                     {
                         "Date": f"{year_val:04d}-{month_val:02d}-02",
                         "Platform": "LinkedIn",
-                        "Topic": f"How to automate content workflows for {brand_name}",
-                        "Working Title": "Save 10+ Hours/Week with Smart Automation",
-                        "Content Pillar": "AI & Productivity Tips",
+                        "Topic": topic_1,
+                        "Working Title": title_1,
+                        "Content Pillar": pillar_1,
                         "Campaign": "Launch Campaign",
                         "Goal": "Lead Generation",
                         "Content Type": "Educational",
                         "Post Format": "Text",
-                        "Suggested CTA": "Start your free trial today",
+                        "Suggested CTA": cta_1,
                         "Priority": "High"
-                    },
-                    {
-                        "Date": f"{year_val:04d}-{month_val:02d}-05",
-                        "Platform": "Twitter",
-                        "Topic": "Productivity hacks for modern social managers",
-                        "Working Title": "Stop manual scheduling. Let AI orchestrate your calendar.",
-                        "Content Pillar": "Growth Case Studies",
-                        "Campaign": "Launch Campaign",
-                        "Goal": "Brand Awareness",
-                        "Content Type": "Entertainment",
-                        "Post Format": "Thread",
-                        "Suggested CTA": "Join the waitlist",
-                        "Priority": "Medium"
                     },
                     {
                         "Date": f"{year_val:04d}-{month_val:02d}-10",
                         "Platform": "Instagram",
-                        "Topic": "Inside our FastAPI Gateway design",
-                        "Working Title": "Building a High-Performance AI Router",
-                        "Content Pillar": "Tech Architecture",
-                        "Campaign": "Behind the Code",
-                        "Goal": "Traffic",
-                        "Content Type": "Educational",
-                        "Post Format": "Carousel",
-                        "Suggested CTA": "Read the engineering blog",
-                        "Priority": "High"
-                    },
-                    {
-                        "Date": f"{year_val:04d}-{month_val:02d}-15",
-                        "Platform": "LinkedIn",
-                        "Topic": "Why compound indexes are vital in MySQL",
-                        "Working Title": "Under the Hood: Database Performance Optimization",
-                        "Content Pillar": "Tech Architecture",
-                        "Campaign": "Behind the Code",
-                        "Goal": "Engagement",
-                        "Content Type": "Educational",
-                        "Post Format": "Text",
-                        "Suggested CTA": "Start your free trial today",
-                        "Priority": "Medium"
-                    },
-                    {
-                        "Date": f"{year_val:04d}-{month_val:02d}-20",
-                        "Platform": "Twitter",
-                        "Topic": "The future of social media operating systems",
-                        "Working Title": "Will AI completely replace scheduling tools?",
-                        "Content Pillar": "AI & Productivity Tips",
-                        "Campaign": "Launch Campaign",
-                        "Goal": "Engagement",
-                        "Content Type": "Engagement",
-                        "Post Format": "Text",
-                        "Suggested CTA": "Follow for daily growth tips",
-                        "Priority": "Low"
-                    },
-                    {
-                        "Date": f"{year_val:04d}-{month_val:02d}-25",
-                        "Platform": "Instagram",
-                        "Topic": f"Why we built {brand_name}",
-                        "Working Title": "Behind the Scenes: Empowering Creators",
-                        "Content Pillar": "Growth Case Studies",
-                        "Campaign": "Behind the Code",
+                        "Topic": topic_2,
+                        "Working Title": title_2,
+                        "Content Pillar": pillar_2,
+                        "Campaign": "Behind the Scenes",
                         "Goal": "Brand Awareness",
                         "Content Type": "Promotional",
-                        "Post Format": "Reel",
-                        "Suggested CTA": "Get started now",
+                        "Post Format": "Carousel",
+                        "Suggested CTA": cta_2,
                         "Priority": "High"
                     }
                 ]
-                import json
                 return {
                     "text": json.dumps(mock_posts),
                     "model": self.model,
                     "raw_response": {"mock": True, "prompt": prompt}
                 }
 
+            # 5. Handle Strategy generation mock
             elif "strategy_name" in prompt or "marketing strategy" in prompt or "strategy generation" in prompt:
+                if industry == "real_estate":
+                    strategy_name = f"{brand_name} Digital Footprint & Authority Strategy"
+                    business_goal = "Establish market leadership in custom luxury building projects within 12 months."
+                    marketing_goal = "Drive qualified design consultations and building contract leads."
+                    platforms = ["LinkedIn", "Instagram"]
+                    pillars = ["Construction Excellence", "Design Innovations", "Customer Journeys"]
+                    campaign_name = "Blueprints to Reality"
+                    campaign_desc = "Weekly progress updates showcasing advanced craftsmanship and luxury properties."
+                elif industry == "restaurant":
+                    strategy_name = f"{brand_name} Taste & Organic Culinary Strategy"
+                    business_goal = "Establish the practice as the premier community destination for farm-to-table dining."
+                    marketing_goal = "Drive consistent table reservations and weekend dining walk-ins."
+                    platforms = ["Instagram", "Facebook"]
+                    pillars = ["Farm-to-Table Freshness", "Chef Specials", "Sustainability Actions"]
+                    campaign_name = "Soil to Plate"
+                    campaign_desc = "Vibrant video spotlights tracking fresh local organic supplies arriving at our kitchen."
+                elif industry == "dentistry":
+                    strategy_name = f"{brand_name} Patient Trust & Care Strategy"
+                    business_goal = "Position the practice as the leading family and cosmetic clinic in the region."
+                    marketing_goal = "Increase new patient checkup registrations by 20% in Q3."
+                    platforms = ["Facebook", "Instagram"]
+                    pillars = ["Preventative Care", "Cosmetic dentistry", "Patient Comfort Care"]
+                    campaign_name = "Comfort Smiles"
+                    campaign_desc = "Patient comfort spotlights highlighting gentle therapies and state-of-the-art procedures."
+                elif industry == "fitness":
+                    strategy_name = f"{brand_name} High-Performance Marketing Strategy"
+                    business_goal = "Boost monthly functional training memberships and personal training enrollments."
+                    marketing_goal = "Position the gym as the leading regional hub for functional fitness."
+                    platforms = ["Instagram", "YouTube"]
+                    pillars = ["Workout Techniques", "Trainer Spotlights", "Member Success Stories"]
+                    campaign_name = "Limits Redefined"
+                    campaign_desc = "Member success transformations showcasing functional techniques and nutrition advice."
+                else:
+                    strategy_name = f"{brand_name} Growth & Automation Strategy"
+                    business_goal = "Establish market authority and scale customer engagement."
+                    marketing_goal = "Drive organic trial signups and user registrations."
+                    platforms = ["LinkedIn", "Twitter"]
+                    pillars = ["AI Productivity", "Tech Architecture", "Growth Hacks"]
+                    campaign_name = "Automation reboot"
+                    campaign_desc = "Showcase daily automation workflows saving time and budget."
+
                 mock_strategy = {
-                    "strategy_name": "GrowthOS Market Authority & Automation Strategy",
-                    "business_goal": "Establish market leadership in the AI-powered social media tooling sector within 6 months.",
-                    "marketing_goal": "Drive 10,000 organic product trials by building a highly engaged developer and creator audience.",
-                    "recommended_platforms": ["LinkedIn", "Twitter", "Instagram"],
-                    "content_pillars": ["AI Productivity", "Tech Architecture", "Growth Hacks"],
+                    "strategy_name": strategy_name,
+                    "business_goal": business_goal,
+                    "marketing_goal": marketing_goal,
+                    "recommended_platforms": platforms,
+                    "content_pillars": pillars,
                     "campaign_ideas": [
                         {
-                            "name": "The 30-Day Social Automation Challenge",
-                            "description": "Showcase daily automation workflows showing how developers can save 10+ hours per week using GrowthOS.",
-                            "duration": "30 days",
-                            "channels": ["Twitter", "LinkedIn"]
-                        },
-                        {
-                            "name": "Behind the Code",
-                            "description": "Weekly deep dives showing how we built our FastAPI AI Gateway, highlighting raw engineering and clean code.",
-                            "duration": "Continuous",
-                            "channels": ["LinkedIn"]
+                            "name": campaign_name,
+                            "description": campaign_desc,
+                            "duration": "3 months",
+                            "channels": platforms
                         }
                     ],
-                    "posting_frequency": "5 times a week on LinkedIn, 3 times a day on Twitter, 3 reels per week on Instagram",
-                    "recommended_formats": ["LinkedIn Carousels", "Twitter/X Threads", "Short-Form Video Reels"],
-                    "tone_guidelines": [
-                        "Speak with clear technical authority but remain friendly.",
-                        "Avoid buzzwords; explain exact mechanisms.",
-                        "Write directly to build connection."
-                    ],
-                    "audience_segments": ["Indie Hackers", "Developer Advocates", "Social Media Agencies"],
-                    "cta_strategy": [
-                        "Direct links to start a free trial (no credit card required)",
-                        "Inviting followers to join the Discord developer community"
-                    ],
-                    "hashtags_strategy": [
-                        "Use 2-3 focused tags like #BuildInPublic and #AIWorkflow on Twitter.",
-                        "Avoid tag stuffing on LinkedIn."
-                    ],
-                    "kpis": [
-                        "Direct click-through rate (CTR) to trial signup page",
-                        "Weekly active user (WAU) growth in our beta Discord",
-                        "Share rate of carousel and thread content"
-                    ],
-                    "growth_recommendations": [
-                        "Engage actively in comments under major SaaS founders' accounts.",
-                        "Publish monthly transparency and build-in-public growth metrics."
-                    ],
-                    "risk_considerations": [
-                        "Platform API rate limit changes could affect automated pipelines.",
-                        "High dependence on AI quality demands constant monitoring."
-                    ],
-                    "confidence_score": 92
+                    "posting_frequency": "3 times per week per platform",
+                    "recommended_formats": ["Video Reels", "Educational Threads"],
+                    "tone_guidelines": ["Speak with clear authority, remain friendly and approachable."],
+                    "audience_segments": ["Target demographic segments interested in quality and reliability."],
+                    "cta_strategy": ["Direct clear actions pointing to booking or trial portals."],
+                    "hashtags_strategy": ["Use 3-5 high-value focused tags, avoid tag stuffing."],
+                    "kpis": ["Direct conversion rate of reservations/bookings/trials"],
+                    "growth_recommendations": ["Collaborate with local brand partners to expand digital authority."],
+                    "risk_considerations": ["Shifts in target ad platform API rules."],
+                    "confidence_score": 95
                 }
-                import json
                 return {
                     "text": json.dumps(mock_strategy),
                     "model": self.model,
                     "raw_response": {"mock": True, "prompt": prompt}
                 }
 
+            # 6. Handle Brand Intelligence generation mock
             elif "JSON" in prompt or "brand personality" in prompt:
-                # Extract brand name dynamically from prompt to make mock more realistic
-                brand_name = "GrowthOS"
-                for line in prompt.split("\n"):
-                    if "- Brand Name:" in line:
-                        brand_name = line.split("- Brand Name:")[-1].strip()
-                        break
+                if industry == "real_estate":
+                    summary = f"{brand_name} specializes in premier property development and high-end construction."
+                    personality = ["Professional", "Reliable", "Precise", "Quality-focused"]
+                    voice = ["Authoritative", "Trustworthy", "Clear"]
+                    demographics = "Affluent individuals, custom home builders"
+                    behaviors = "Seeking customized solutions, high quality standards"
+                    pains = "Unreliable builders, poor structural transparency"
+                    problems = ["Project delays", "Low-grade materials", "Lack of clear engineering info"]
+                    goals = ["Build custom properties", "Worry-free project management"]
+                    objectives = ["Establish brand quality authority"]
+                    comp_summary = "Competitors compete on price; this brand differentiates on quality and precision."
+                    pillars = ["Construction Excellence", "Design Innovations", "Customer Journeys"]
+                    cta_list = ["Book custom property scan consultation"]
+                    tags = ["#Construction", "#RealEstate", f"#{brand_name.replace(' ', '')}"]
+                elif industry == "restaurant":
+                    summary = f"{brand_name} is a premier dining destination focusing on sustainable, organic, farm-to-table culinary experiences."
+                    personality = ["Welcoming", "Vibrant", "Eco-conscious", "Artisanal"]
+                    voice = ["Warm", "Sensory-rich", "Friendly"]
+                    demographics = "Health-conscious locals, couples, culinary enthusiasts"
+                    behaviors = "Prefers organic food, values green initiatives"
+                    pains = "Lack of genuine organic local foods, process-heavy menus"
+                    problems = ["Few healthy menu options nearby", "Lack of farm trace sources"]
+                    goals = ["Enjoy healthy artisanal dining", "Discover fresh chef recipes"]
+                    objectives = ["Establish regional community dining leadership"]
+                    comp_summary = "Competitors offer fast casual; this practice leads in culinary organic freshness."
+                    pillars = ["Farm-to-Table Freshness", "Chef Specials", "Sustainability Actions"]
+                    cta_list = ["Reserve dinner table online"]
+                    tags = ["#FarmToTable", "#OrganicFood", f"#{brand_name.replace(' ', '')}"]
+                elif industry == "dentistry":
+                    summary = f"{brand_name} provides state-of-the-art preventative, restorative, and cosmetic dental treatments in a relaxing environment."
+                    personality = ["Caring", "Gentle", "Professional", "Advanced"]
+                    voice = ["Reassuring", "Educational", "Approachable"]
+                    demographics = "Families, local residents seeking cosmetic enhancements"
+                    behaviors = "Consistently tracks hygiene checkups, values clean aesthetics"
+                    pains = "Dental phobia, lack of transparent pricing"
+                    problems = ["Painful standard checkups", "Unhappy with teeth stains"]
+                    goals = ["Gentle checkups", "Bright confidence-boosting smiles"]
+                    objectives = ["Become the most recommended regional clinic practice"]
+                    comp_summary = "Competitors lack patient comfort focus; this clinic stands out for gentle care."
+                    pillars = ["Preventative Care", "Cosmetic dentistry", "Patient Comfort Care"]
+                    cta_list = ["Book dental checkup online"]
+                    tags = ["#DentalHealth", "#SmileCare", f"#{brand_name.replace(' ', '')}"]
+                elif industry == "fitness":
+                    summary = f"{brand_name} is a high-performance training facility offering group classes, personal training, and recovery wellness."
+                    personality = ["Motivating", "Energetic", "Discipline-driven", "Community-centric"]
+                    voice = ["Empowering", "Direct", "Inspiring"]
+                    demographics = "Fitness enthusiasts, local professionals seeking coaching"
+                    behaviors = "Tracks weekly exercise routines, attends group workouts"
+                    pains = "Loss of workout routine accountability, unguided training"
+                    problems = ["Lack of strength progress", "Injury from incorrect form"]
+                    goals = ["Build functional strength", "Learn elite trainer techniques"]
+                    objectives = ["Establish practice as regional functional training leader"]
+                    comp_summary = "Competitors operate self-access gyms; this gym leads in coaching quality."
+                    pillars = ["Workout Techniques", "Trainer Spotlights", "Member Success Stories"]
+                    cta_list = ["Get free 3-day guest pass"]
+                    tags = ["#FitnessGoals", "#GymLife", f"#{brand_name.replace(' ', '')}"]
+                else:
+                    summary = f"{brand_name} is a leading provider of innovative workspace solutions."
+                    personality = ["Innovative", "Reliable", "Confident", "Insightful"]
+                    voice = ["Insightful", "Professional yet approachable"]
+                    demographics = "SaaS developers, professional social managers"
+                    behaviors = "Seeking automation pipelines to optimize daily task flows"
+                    pains = "Manual workflow delays, uninspired layouts"
+                    problems = ["Manual digital tracking", "Slow template generation"]
+                    goals = ["Automate social channels", "Build digital growth resonance"]
+                    objectives = ["Differentiate based on AI assistant efficiency features"]
+                    comp_summary = "Competitors lack custom integrations; this brand leads in gateway routing speeds."
+                    pillars = ["AI Productivity", "Tech Architecture", "Growth Hacks"]
+                    cta_list = ["Start free workspace trial"]
+                    tags = ["#DigitalGrowth", "#Productivity", f"#{brand_name.replace(' ', '')}"]
 
                 mock_data = {
-                    "summary": f"{brand_name} is a revolutionary digital presence and marketing solution designed to automate workflows and scale target audience engagement.",
-                    "brand_personality": ["Innovative", "Empowering", "Reliable", "Creative"],
-                    "brand_voice": ["Confident", "Professional yet approachable", "Insightful"],
+                    "summary": summary,
+                    "brand_personality": personality,
+                    "brand_voice": voice,
                     "ideal_customer": {
-                        "demographics": "Target audience segment and key client base interested in professional growth.",
-                        "behaviors": "Consistently active on digital channels, seeking efficient scheduling and optimization tools.",
-                        "pains": "Struggling with content consistency, platform growth strategy, and actionable resonance metrics."
+                        "demographics": demographics,
+                        "behaviors": behaviors,
+                        "pains": pains
                     },
-                    "customer_problems": [
-                        "Digital publishing is manual and tedious",
-                        "Content generation is slow and uninspired",
-                        "Difficult to build brand positioning and resonance"
-                    ],
-                    "customer_goals": [
-                        "Automate content calendar strategy",
-                        "Create high-quality copy in seconds",
-                        "Boost engagement rates with smart timing recommendations"
-                    ],
-                    "marketing_objectives": [
-                        "Build community authority on professional networks",
-                        "Drive organic engagement via high-value content",
-                        f"Establish {brand_name} as a market leader in this domain"
-                    ],
-                    "competitor_summary": f"Major competitors are traditional platforms that lack deep customization and intelligent recommendations tailored for {brand_name}.",
-                    "recommended_content_pillars": [
-                        "Industry insights & Professional tips",
-                        "Growth & optimization case studies",
-                        f"{brand_name} Project Spotlights"
-                    ],
-                    "recommended_posting_frequency": "5 times per week across target professional networks",
-                    "recommended_cta": [
-                        "Explore the core offering today",
-                        f"Get started with {brand_name}",
-                        f"Join the {brand_name} waitlist and community"
-                    ],
-                    "recommended_hashtags": ["#DigitalGrowth", f"#{brand_name.replace(' ', '')}", "#Productivity", "#Strategy"],
-                    "strengths": [
-                        "Modern UI with glassmorphism design",
-                        "Seamless Laravel-FastAPI integration",
-                        "Robust, test-driven code foundation"
-                    ],
-                    "weaknesses": [
-                        "New brand positioning in a highly saturated market",
-                        "Initial platform scaling under active development"
-                    ],
-                    "opportunities": [
-                        "Rising global demand for workflow automation",
-                        "Direct API integrations with emerging platforms"
-                    ],
-                    "risks": [
-                        "Frequent shifts in platform API terms of service",
-                        "Aggressive feature copying from established legacy competitors"
-                    ],
+                    "customer_problems": problems,
+                    "customer_goals": goals,
+                    "marketing_objectives": objectives,
+                    "competitor_summary": comp_summary,
+                    "recommended_content_pillars": pillars,
+                    "recommended_posting_frequency": "3 times per week per platform",
+                    "recommended_cta": cta_list,
+                    "recommended_hashtags": tags,
+                    "strengths": ["Clear positioning", "Differentiated quality value"],
+                    "weaknesses": ["New brand in local market"],
+                    "opportunities": ["Rising regional demand for specialized services"],
+                    "risks": ["Rapid competitor imitation"],
                     "confidence_score": 95
                 }
-                import json
                 return {
                     "text": json.dumps(mock_data),
                     "model": self.model,
                     "raw_response": {"mock": True, "prompt": prompt}
                 }
 
-
-
             return {
-                "text": f"Simulated response to prompt '{prompt}' from Gemini AI model: The sky is blue and GrowthOS AI Gateway is fully operational.",
+                "text": f"Simulated response to prompt from Gemini AI model. Target brand '{brand_name}' is fully operational in '{industry}' industry.",
                 "model": self.model,
                 "raw_response": {"mock": True, "prompt": prompt}
             }
