@@ -48,11 +48,22 @@ class DashboardController extends Controller
         $postsApprovedCount = 0;
         $postsScheduledCount = 0;
 
+        // Caption metrics
+        $captionsGeneratedCount = 0;
+        $captionsPendingCount = 0;
+        $captionsApprovedCount = 0;
+        $captionsRejectedCount = 0;
+
         if ($organization) {
             $hasCalendar = $organization->contentCalendars()->exists();
             $postsPlannedCount = $organization->contentCalendars()->where('status', 'Draft')->count();
             $postsApprovedCount = $organization->contentCalendars()->where('status', 'Approved')->count();
             $postsScheduledCount = $organization->contentCalendars()->where('status', 'Scheduled')->count();
+
+            $captionsGeneratedCount = $organization->contentCaptions()->count();
+            $captionsApprovedCount = $organization->contentCaptions()->where('status', 'Approved')->count();
+            $captionsRejectedCount = $organization->contentCaptions()->where('status', 'Rejected')->count();
+            $captionsPendingCount = $organization->contentCalendars()->whereDoesntHave('caption')->count();
         }
 
         $aiStatus = $this->aiService->getStatusForDashboard();
@@ -69,7 +80,11 @@ class DashboardController extends Controller
             'hasCalendar',
             'postsPlannedCount',
             'postsApprovedCount',
-            'postsScheduledCount'
+            'postsScheduledCount',
+            'captionsGeneratedCount',
+            'captionsPendingCount',
+            'captionsApprovedCount',
+            'captionsRejectedCount'
         ));
     }
 }

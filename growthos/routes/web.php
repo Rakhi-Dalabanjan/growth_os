@@ -105,8 +105,28 @@ Route::middleware(['auth'])->group(function () {
         ->name('content-calendar.duplicate');
     Route::post('/content-calendar/bulk', [\App\Http\Controllers\ContentCalendarController::class, 'bulkAction'])
         ->name('content-calendar.bulk');
-    Route::get('/ai-studio', fn() => view('coming-soon', ['feature' => 'AI Studio']))
+    // Caption Studio
+    Route::get('/caption-studio', [\App\Http\Controllers\CaptionController::class, 'index'])
+        ->name('caption.index');
+    Route::get('/ai-studio', fn() => redirect()->route('caption.index'))
         ->name('ai-studio');
+    Route::post('/caption-studio/generate/{calendarId}', [\App\Http\Controllers\CaptionController::class, 'generate'])
+        ->name('caption.generate');
+    Route::post('/caption-studio/regenerate/{id}', [\App\Http\Controllers\CaptionController::class, 'regenerate'])
+        ->name('caption.regenerate');
+    Route::put('/caption-studio/{id}', [\App\Http\Controllers\CaptionController::class, 'update'])
+        ->name('caption.update');
+    Route::post('/caption-studio/{id}/duplicate', [\App\Http\Controllers\CaptionController::class, 'duplicate'])
+        ->name('caption.duplicate');
+    Route::delete('/caption-studio/{id}', [\App\Http\Controllers\CaptionController::class, 'destroy'])
+        ->name('caption.destroy');
+    Route::post('/caption-studio/{id}/approve', [\App\Http\Controllers\CaptionController::class, 'approve'])
+        ->name('caption.approve');
+    Route::post('/caption-studio/{id}/reject', [\App\Http\Controllers\CaptionController::class, 'reject'])
+        ->name('caption.reject');
+    Route::post('/caption-studio/bulk', [\App\Http\Controllers\CaptionController::class, 'bulk'])
+        ->name('caption.bulk');
+
     Route::get('/assets', fn() => view('coming-soon', ['feature' => 'Assets']))
         ->name('assets');
     Route::get('/analytics', fn() => view('coming-soon', ['feature' => 'Analytics']))

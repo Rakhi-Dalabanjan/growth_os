@@ -344,14 +344,12 @@
            class="nav-link {{ request()->routeIs('content-calendar') ? 'active' : '' }}">
             <i class="bi bi-calendar3 nav-icon"></i>
             Content Calendar
-            <span class="nav-badge badge bg-secondary" style="font-size:0.6rem;">Soon</span>
         </a>
 
         <a href="{{ route('ai-studio') }}"
-           class="nav-link {{ request()->routeIs('ai-studio') ? 'active' : '' }}">
+           class="nav-link {{ request()->routeIs('ai-studio') || request()->routeIs('caption.*') ? 'active' : '' }}">
             <i class="bi bi-stars nav-icon"></i>
-            AI Studio
-            <span class="nav-badge badge bg-secondary" style="font-size:0.6rem;">Soon</span>
+            Caption Studio
         </a>
 
         <a href="{{ route('ai-gateway.index') }}"

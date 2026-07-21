@@ -60,4 +60,12 @@ class ContentCalendar extends Model
     {
         return $this->belongsTo(MarketingStrategy::class);
     }
+
+    /**
+     * Get the caption associated with this content calendar entry.
+     */
+    public function caption(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ContentCaption::class, 'content_calendar_id');
+    }
 }

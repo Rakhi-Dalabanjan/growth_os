@@ -87,6 +87,14 @@ class Organization extends Model
     }
 
     /**
+     * Get the content captions associated with this organization.
+     */
+    public function contentCaptions(): HasMany
+    {
+        return $this->hasMany(ContentCaption::class);
+    }
+
+    /**
      * Get the logo URL accessor.
      */
     public function getLogoUrlAttribute(): ?string

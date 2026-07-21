@@ -18,7 +18,54 @@ class GeminiProvider(BaseAIProvider):
             # Simulate network delay and return mock text
             await asyncio.sleep(0.1)
             
-            if "content calendar" in prompt or "calendar generation" in prompt or "monthly calendar" in prompt:
+            if "Social Media Copywriter" in prompt or "engaging caption" in prompt:
+                platform = "Instagram"
+                if "Target Platform: LinkedIn" in prompt:
+                    platform = "LinkedIn"
+                elif "Target Platform: X (Twitter)" in prompt:
+                    platform = "X (Twitter)"
+                elif "Target Platform: Twitter" in prompt:
+                    platform = "Twitter"
+                elif "Target Platform: Facebook" in prompt:
+                    platform = "Facebook"
+                elif "Target Platform: Threads" in prompt:
+                    platform = "Threads"
+                elif "Target Platform: YouTube" in prompt:
+                    platform = "YouTube"
+                elif "Target Platform: Instagram" in prompt:
+                    platform = "Instagram"
+
+                import re
+                tone = "Professional"
+                tone_match = re.search(r'- Tone:\s*(\w+)', prompt)
+                if tone_match:
+                    tone = tone_match.group(1)
+
+                language = "English"
+                lang_match = re.search(r'- Language:\s*(\w+)', prompt)
+                if lang_match:
+                    language = lang_match.group(1)
+
+                mock_caption = {
+                    "Platform": platform,
+                    "Headline": "Unlocking AI Productivity",
+                    "Caption": f"This is a simulated high-quality social media caption for {platform}. We design workflows that keep you ahead.",
+                    "Call To Action": "Get started with GrowthOS today.",
+                    "Primary Keywords": ["productivity", "AI", "workflow"],
+                    "Suggested Hashtags": ["#AI", "#Productivity", f"#{platform.replace(' ', '')}"],
+                    "Emoji Recommendation": "🚀✨📈",
+                    "Tone": tone,
+                    "Language": language,
+                    "Estimated Character Count": 150
+                }
+                import json
+                return {
+                    "text": json.dumps(mock_caption),
+                    "model": self.model,
+                    "raw_response": {"mock": True, "prompt": prompt}
+                }
+
+            elif "content calendar" in prompt or "calendar generation" in prompt or "monthly calendar" in prompt:
                 # Extract month and year from prompt
                 month_val = 7
                 year_val = 2026
@@ -257,6 +304,8 @@ class GeminiProvider(BaseAIProvider):
                     "model": self.model,
                     "raw_response": {"mock": True, "prompt": prompt}
                 }
+
+
 
             return {
                 "text": f"Simulated response to prompt '{prompt}' from Gemini AI model: The sky is blue and GrowthOS AI Gateway is fully operational.",
