@@ -79,6 +79,14 @@ class Organization extends Model
     }
 
     /**
+     * Get the content calendar posts associated with this organization.
+     */
+    public function contentCalendars(): HasMany
+    {
+        return $this->hasMany(ContentCalendar::class);
+    }
+
+    /**
      * Get the logo URL accessor.
      */
     public function getLogoUrlAttribute(): ?string

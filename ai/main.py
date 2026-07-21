@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from config.settings import settings
-from routers import communication, health, gateway, brand_intelligence, marketing_strategy
+from routers import communication, health, gateway, brand_intelligence, marketing_strategy, content_calendar
 from schemas.response import make_response
 
 app = FastAPI(
@@ -15,6 +15,7 @@ app.include_router(health.router)
 app.include_router(gateway.router)
 app.include_router(brand_intelligence.router)
 app.include_router(marketing_strategy.router)
+app.include_router(content_calendar.router)
 
 @app.get("/")
 async def root():

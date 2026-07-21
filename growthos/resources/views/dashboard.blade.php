@@ -256,6 +256,54 @@
                             @endif
                         </div>
                     @endif
+        <!-- Content Calendar Card -->
+        <div class="col-12 col-sm-6 col-xl-4">
+            <div class="card stat-card h-100" style="border-radius:12px;">
+                <div class="card-body p-4 d-flex flex-column justify-content-between">
+                    <div class="d-flex align-items-start justify-content-between mb-3">
+                        <div>
+                            <p class="mb-1" style="font-size:0.78rem;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:#94a3b8;">Content Calendar</p>
+                            @if($hasCalendar)
+                                <h4 class="fw-bold mb-1" style="color:#16a34a;font-size:1.1rem;">Generated</h4>
+                                <div style="font-size:0.8rem;color:#64748b;" class="mb-1">
+                                    <strong>Posts Drafted:</strong> {{ $postsPlannedCount }}<br>
+                                    <strong>Posts Approved:</strong> {{ $postsApprovedCount }}<br>
+                                    <strong>Posts Scheduled:</strong> {{ $postsScheduledCount }}
+                                </div>
+                            @else
+                                <h4 class="fw-bold mb-1" style="color:#e2e8f0;background:#64748b;padding:0.1rem 0.5rem;border-radius:6px;font-size:0.8rem;display:inline-block;">Not Generated</h4>
+                                <div style="font-size:0.8rem;color:#94a3b8;" class="mt-2 mb-1">
+                                    Schedule monthly social media posts.
+                                </div>
+                            @endif
+                        </div>
+                        <div style="width:46px;height:46px;background:#f0fdf4;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="bi bi-calendar-event" style="color:#16a34a;font-size:1.3rem;"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-auto">
+                        @if($hasCalendar)
+                            <a href="{{ route('content-calendar') }}" class="btn btn-sm btn-outline-primary w-100" style="font-size:0.78rem;">
+                                <i class="bi bi-eye-fill"></i> View Calendar
+                            </a>
+                        @else
+                            @if($marketingStrategy)
+                                <form action="{{ route('content-calendar.generate') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="month" value="{{ now()->month }}">
+                                    <input type="hidden" name="year" value="{{ now()->year }}">
+                                    <button type="submit" class="btn btn-sm btn-primary w-100" style="font-size:0.78rem;">
+                                        <i class="bi bi-magic"></i> Generate Calendar
+                                    </button>
+                                </form>
+                            @else
+                                <a href="{{ route('marketing-strategy') }}" class="btn btn-sm btn-outline-secondary w-100" style="font-size:0.78rem;">
+                                    Generate Strategy first
+                                </a>
+                            @endif
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>

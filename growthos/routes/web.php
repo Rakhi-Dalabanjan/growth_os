@@ -90,8 +90,21 @@ Route::middleware(['auth'])->group(function () {
         ->name('social-accounts.sync');
     Route::get('/mock/meta/auth', [\App\Http\Controllers\SocialAccountsController::class, 'simulator'])
         ->name('meta.simulator');
-    Route::get('/content-calendar', fn() => view('coming-soon', ['feature' => 'Content Calendar']))
+    // Content Calendar
+    Route::get('/content-calendar', [\App\Http\Controllers\ContentCalendarController::class, 'index'])
         ->name('content-calendar');
+    Route::post('/content-calendar/generate', [\App\Http\Controllers\ContentCalendarController::class, 'generate'])
+        ->name('content-calendar.generate');
+    Route::post('/content-calendar/store', [\App\Http\Controllers\ContentCalendarController::class, 'store'])
+        ->name('content-calendar.store');
+    Route::put('/content-calendar/{id}', [\App\Http\Controllers\ContentCalendarController::class, 'update'])
+        ->name('content-calendar.update');
+    Route::delete('/content-calendar/{id}', [\App\Http\Controllers\ContentCalendarController::class, 'destroy'])
+        ->name('content-calendar.destroy');
+    Route::post('/content-calendar/{id}/duplicate', [\App\Http\Controllers\ContentCalendarController::class, 'duplicate'])
+        ->name('content-calendar.duplicate');
+    Route::post('/content-calendar/bulk', [\App\Http\Controllers\ContentCalendarController::class, 'bulkAction'])
+        ->name('content-calendar.bulk');
     Route::get('/ai-studio', fn() => view('coming-soon', ['feature' => 'AI Studio']))
         ->name('ai-studio');
     Route::get('/assets', fn() => view('coming-soon', ['feature' => 'Assets']))

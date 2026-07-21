@@ -18,7 +18,117 @@ class GeminiProvider(BaseAIProvider):
             # Simulate network delay and return mock text
             await asyncio.sleep(0.1)
             
-            if "strategy_name" in prompt or "marketing strategy" in prompt or "strategy generation" in prompt:
+            if "content calendar" in prompt or "calendar generation" in prompt or "monthly calendar" in prompt:
+                # Extract month and year from prompt
+                month_val = 7
+                year_val = 2026
+                month_names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+                for i, m_name in enumerate(month_names, 1):
+                    if m_name in prompt:
+                        month_val = i
+                        break
+                import re
+                year_match = re.search(r'\b(202[4-9]|2030)\b', prompt)
+                if year_match:
+                    year_val = int(year_match.group(1))
+                
+                brand_name = "GrowthOS"
+                for line in prompt.split("\n"):
+                    if "Brand Name:" in line:
+                        brand_name = line.split("Brand Name:")[-1].strip()
+                        break
+                    elif "Strategy Name:" in line:
+                        brand_name = line.split("Strategy Name:")[-1].replace("Strategy", "").replace("Strategy", "").strip()
+                        break
+
+                mock_posts = [
+                    {
+                        "Date": f"{year_val:04d}-{month_val:02d}-02",
+                        "Platform": "LinkedIn",
+                        "Topic": f"How to automate content workflows for {brand_name}",
+                        "Working Title": "Save 10+ Hours/Week with Smart Automation",
+                        "Content Pillar": "AI & Productivity Tips",
+                        "Campaign": "Launch Campaign",
+                        "Goal": "Lead Generation",
+                        "Content Type": "Educational",
+                        "Post Format": "Text",
+                        "Suggested CTA": "Start your free trial today",
+                        "Priority": "High"
+                    },
+                    {
+                        "Date": f"{year_val:04d}-{month_val:02d}-05",
+                        "Platform": "Twitter",
+                        "Topic": "Productivity hacks for modern social managers",
+                        "Working Title": "Stop manual scheduling. Let AI orchestrate your calendar.",
+                        "Content Pillar": "Growth Case Studies",
+                        "Campaign": "Launch Campaign",
+                        "Goal": "Brand Awareness",
+                        "Content Type": "Entertainment",
+                        "Post Format": "Thread",
+                        "Suggested CTA": "Join the waitlist",
+                        "Priority": "Medium"
+                    },
+                    {
+                        "Date": f"{year_val:04d}-{month_val:02d}-10",
+                        "Platform": "Instagram",
+                        "Topic": "Inside our FastAPI Gateway design",
+                        "Working Title": "Building a High-Performance AI Router",
+                        "Content Pillar": "Tech Architecture",
+                        "Campaign": "Behind the Code",
+                        "Goal": "Traffic",
+                        "Content Type": "Educational",
+                        "Post Format": "Carousel",
+                        "Suggested CTA": "Read the engineering blog",
+                        "Priority": "High"
+                    },
+                    {
+                        "Date": f"{year_val:04d}-{month_val:02d}-15",
+                        "Platform": "LinkedIn",
+                        "Topic": "Why compound indexes are vital in MySQL",
+                        "Working Title": "Under the Hood: Database Performance Optimization",
+                        "Content Pillar": "Tech Architecture",
+                        "Campaign": "Behind the Code",
+                        "Goal": "Engagement",
+                        "Content Type": "Educational",
+                        "Post Format": "Text",
+                        "Suggested CTA": "Start your free trial today",
+                        "Priority": "Medium"
+                    },
+                    {
+                        "Date": f"{year_val:04d}-{month_val:02d}-20",
+                        "Platform": "Twitter",
+                        "Topic": "The future of social media operating systems",
+                        "Working Title": "Will AI completely replace scheduling tools?",
+                        "Content Pillar": "AI & Productivity Tips",
+                        "Campaign": "Launch Campaign",
+                        "Goal": "Engagement",
+                        "Content Type": "Engagement",
+                        "Post Format": "Text",
+                        "Suggested CTA": "Follow for daily growth tips",
+                        "Priority": "Low"
+                    },
+                    {
+                        "Date": f"{year_val:04d}-{month_val:02d}-25",
+                        "Platform": "Instagram",
+                        "Topic": f"Why we built {brand_name}",
+                        "Working Title": "Behind the Scenes: Empowering Creators",
+                        "Content Pillar": "Growth Case Studies",
+                        "Campaign": "Behind the Code",
+                        "Goal": "Brand Awareness",
+                        "Content Type": "Promotional",
+                        "Post Format": "Reel",
+                        "Suggested CTA": "Get started now",
+                        "Priority": "High"
+                    }
+                ]
+                import json
+                return {
+                    "text": json.dumps(mock_posts),
+                    "model": self.model,
+                    "raw_response": {"mock": True, "prompt": prompt}
+                }
+
+            elif "strategy_name" in prompt or "marketing strategy" in prompt or "strategy generation" in prompt:
                 mock_strategy = {
                     "strategy_name": "GrowthOS Market Authority & Automation Strategy",
                     "business_goal": "Establish market leadership in the AI-powered social media tooling sector within 6 months.",

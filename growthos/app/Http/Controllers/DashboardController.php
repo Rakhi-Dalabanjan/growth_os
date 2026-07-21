@@ -42,6 +42,19 @@ class DashboardController extends Controller
         $brandIntelligence = $organization ? $organization->brandIntelligence : null;
         $marketingStrategy = $organization ? $organization->marketingStrategy : null;
 
+        // Content Calendar metrics
+        $hasCalendar = false;
+        $postsPlannedCount = 0;
+        $postsApprovedCount = 0;
+        $postsScheduledCount = 0;
+
+        if ($organization) {
+            $hasCalendar = $organization->contentCalendars()->exists();
+            $postsPlannedCount = $organization->contentCalendars()->where('status', 'Draft')->count();
+            $postsApprovedCount = $organization->contentCalendars()->where('status', 'Approved')->count();
+            $postsScheduledCount = $organization->contentCalendars()->where('status', 'Scheduled')->count();
+        }
+
         $aiStatus = $this->aiService->getStatusForDashboard();
 
         return view('dashboard', compact(
@@ -52,7 +65,11 @@ class DashboardController extends Controller
             'socialAccountsCount',
             'aiStatus',
             'brandIntelligence',
-            'marketingStrategy'
+            'marketingStrategy',
+            'hasCalendar',
+            'postsPlannedCount',
+            'postsApprovedCount',
+            'postsScheduledCount'
         ));
     }
 }

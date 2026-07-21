@@ -7,7 +7,7 @@
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-decoration-none">Dashboard</a></li>
             <li class="breadcrumb-item active">AI Gateway</li>
         </ol>
-    </nav>
+    </nav>  
 
     <!-- Alert notifications -->
     <div id="alert-container"></div>
